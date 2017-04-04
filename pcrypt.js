@@ -5,25 +5,6 @@ let unshuffle2 = require('./unshuffle-2');
 let twofish = require('twofish');
 
 let shuffle3, unshuffle3;
-// {
-// 	let twofish = require('twofish').twofish();
-// 	let key = [
-// 		0x4f, 0xeb, 0x1c, 0xa5, 0xf6, 0x1a, 0x67, 0xce,
-// 		0x43, 0xf3, 0xf0, 0x0c, 0xb1, 0x23, 0x88, 0x35,
-// 		0xe9, 0x8b, 0xe8, 0x39, 0xd8, 0x89, 0x8f, 0x5a,
-// 		0x3b, 0x51, 0x2e, 0xa9, 0x47, 0x38, 0xc4, 0x14,
-// 	];
-// 	let fns = [ twofish.encrypt, twofish.decrypt ].map(function(fn) {
-// 		return function(vector) {
-// 			let vector8 = new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength);
-// 			let output = fn(key, vector8);
-// 			vector8.set(output);
-// 		};
-// 	});
-// 	shuffle3 = fns[0];
-// 	unshuffle3 = fns[1];
-// }
-
 {
 	let key = [
 		0x4f, 0xeb, 0x1c, 0xa5, 0xf6, 0x1a, 0x67, 0xce,
@@ -33,12 +14,15 @@ let shuffle3, unshuffle3;
 	];
 
 	shuffle3 = function(ms) {
-		let tf = twofish.twofish(undefined, ms);
-		return function(vector) {
-			let vector8 = new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength);
-			let output = tf.encrypt(key, vector8);
-			vector8.set(output);		
-		};
+		// let tf = twofish.twofish(undefined, ms);
+		let tf = twofish.twofish();
+		return {
+			fs: function(vector) {
+				let vector8 = new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength);
+				let output = tf.encrypt(key, vector8);
+				vector8.set(output);		
+			},
+			iv: 
 	};
 
 	unshuffle3 = function(ms) {
@@ -169,10 +153,11 @@ module.exports = {
 		} else {
 			shuffleFn = shuffle3(ms);
 			blockSize = 16;
+			cipher8
 			output8[totalSize - 1] = makeIntegrityByte3();
 		}
 
-		// Encrypt in chunks of 256 bytes
+		// Encrypt in chunks of 256 or 16 bytes depending on version
 		for (let offset = 4; offset < totalSize - 1; offset += blockSize) {
 			for (let ii = 0; ii < blockSize / 4; ++ii) {
 				output32[offset / 4 + ii] ^= cipher32[ii];
