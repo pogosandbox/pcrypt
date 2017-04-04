@@ -33,21 +33,21 @@ let shuffle3, unshuffle3;
 	];
 
 	shuffle3 = function(ms) {
-		let tf = twofish.twofish(ms);
+		let tf = twofish.twofish(undefined, ms);
 		return function(vector) {
 			let vector8 = new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength);
 			let output = tf.encrypt(key, vector8);
 			vector8.set(output);		
-		}
+		};
 	};
 
 	unshuffle3 = function(ms) {
-		let tf = twofish.twofish(ms);
+		let tf = twofish.twofish();
 		return function(vector) {
 			let vector8 = new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength);
 			let output = tf.decrypt(key, vector8);
 			vector8.set(output);		
-		}
+		};
 	};
 }
 
